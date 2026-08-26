@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Quản lý danh mục — Thơm Station</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#071426">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="admin-shell">
+    <header class="admin-topbar">
+      <a class="admin-brand" href="index.html" target="_blank" rel="noopener noreferrer">
+        <span aria-hidden="true"><i></i></span>
+        <strong>THƠM STATION</strong>
+      </a>
+      <a class="view-site" href="index.html" target="_blank" rel="noopener noreferrer">Xem trang nghe nhạc ↗</a>
+    </header>
+
+    <section class="admin-intro">
+      <div>
+        <p class="eyebrow">ARCHIVE CONTROL · PRIVATE ACCESS</p>
+        <h1>Quản lý kho<br><em>tín hiệu</em></h1>
+        <p>Thêm, sửa hoặc xóa những mảnh ký ức âm nhạc. Khi hoàn tất, bấm “Đăng thay đổi” để cập nhật website.</p>
+      </div>
+      <div class="intro-sparkles" aria-hidden="true"><span></span><span></span><span></span></div>
+    </section>
+
+    <section class="connection-card" aria-labelledby="connection-title">
+      <div class="section-heading">
+        <div><span class="step">1</span><h2 id="connection-title">Kết nối kho GitHub</h2></div>
+        <span id="connection-badge" class="status-badge">Chưa kết nối</span>
+      </div>
+      <p class="connection-note">Bạn chỉ cần nhập một lần thông tin repository. Mã truy cập chỉ tồn tại trong phiên đang mở, không được ghi vào website.</p>
+      <div class="connection-grid">
+        <label>Chủ repository<input id="repo-owner" autocomplete="username" placeholder="Ví dụ: ten-github"></label>
+        <label>Tên repository<input id="repo-name" placeholder="Ví dụ: thom-station"></label>
+        <label>Nhánh<input id="repo-branch" value="main" placeholder="main"></label>
+        <label>File dữ liệu<input id="repo-path" value="catalog.js" placeholder="catalog.js"></label>
+        <label class="token-field">GitHub token<input id="repo-token" type="password" autocomplete="off" placeholder="github_pat_..."></label>
+        <button id="connect-button" class="primary-button" type="button">Kết nối</button>
+      </div>
+      <details>
+        <summary>Cách tạo mã truy cập an toàn</summary>
+        <ol>
+          <li>Mở trang <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">Fine-grained token ↗</a>.</li>
+          <li>Chỉ chọn repository chứa website này.</li>
+          <li>Trong quyền repository, đặt <strong>Contents: Read and write</strong>.</li>
+        </ol>
+      </details>
+      <p id="connection-message" class="message" aria-live="polite"></p>
+    </section>
+
+    <section id="manager" class="manager" aria-labelledby="manager-title">
+      <div class="manager-toolbar">
+        <div>
+          <span class="step">2</span>
+          <div><h2 id="manager-title">Danh sách bài hát</h2></div>
+        </div>
+        <div class="toolbar-actions">
+          <button id="new-track" class="secondary-button" type="button">+ Thêm bài</button>
+          <button id="publish-button" class="primary-button" type="button" disabled>Đăng thay đổi</button>
+        </div>
+      </div>
+
+      <div class="workspace">
+        <aside class="track-sidebar">
+          <label class="admin-search"><span class="sr-only">Tìm bài</span><input id="admin-search" type="search" placeholder="Tìm bài hát, nghệ sĩ hoặc ký ức..."></label>
+          <div class="admin-list-controls">
+            <div class="admin-filter-row" aria-label="Lọc danh mục">
+              <button class="active" type="button" data-admin-filter="all" aria-pressed="true">ALL</button>
+              <button type="button" data-admin-filter="dsp" aria-pressed="false">JGKiD</button>
+              <button type="button" data-admin-filter="underground" aria-pressed="false">Underground</button>
+              <button type="button" data-admin-filter="soundcloud" aria-pressed="false">SoundCloud</button>
+              <button type="button" data-admin-filter="dalab" aria-pressed="false">Da LAB</button>
+            </div>
+            <label class="admin-sort"><span>Sắp xếp</span>
+              <select id="admin-sort">
+                <option value="newest">Mới nhất</option>
+                <option value="oldest">Cũ nhất</option>
+                <option value="az">Tên A–Z</option>
+              </select>
+            </label>
+          </div>
+          <div id="admin-list" class="admin-list" aria-live="polite"></div>
+        </aside>
+
+        <section class="editor-card" aria-labelledby="editor-title">
+          <div class="editor-heading">
+            <div><p id="editor-mode">THÊM MỚI</p><h2 id="editor-title">Thông tin bài hát</h2></div>
+            <button id="delete-track" class="danger-button" type="button" hidden>Xóa bài</button>
+          </div>
+
+          <form id="track-form">
+            <input id="track-id" type="hidden">
+            <div class="form-grid">
+              <label class="wide">Tên bài hát <em>*</em><input id="track-title" required></label>
+              <label class="wide">Nghệ sĩ <em>*</em><input id="track-artist" required></label>
+              <label>Danh mục <em>*</em>
+                <select id="track-category" required>
+                  <option value="dsp">JGKiD</option>
+                  <option value="soundcloud">SoundCloud</option>
+                  <option value="underground">Underground</option>
+                  <option value="dalab">Da LAB</option>
+                </select>
+              </label>
+              <label>Năm phát hành<input id="track-year" type="number" min="1900" max="2100" inputmode="numeric"></label>
+              <label>Ngày phát hành<input id="track-date" type="date"></label>
+              <label>Album / phát hành<input id="track-meta"></label>
+              <label>Thể loại / ghi chú ngắn<input id="track-detail"></label>
+              <label class="wide">Ghi chú<textarea id="track-note" rows="2"></textarea></label>
+              <label class="wide">Link tham khảo chính <em>*</em><input id="track-primary" type="url" required placeholder="https://..."></label>
+            </div>
+
+            <div class="links-heading"><div><h3>Nền tảng nghe</h3><p>Spotify, YouTube, SoundCloud, Apple Music…</p></div><button id="add-link" class="text-button" type="button">+ Thêm link</button></div>
+            <div id="link-rows" class="link-rows"></div>
+
+            <div class="form-actions">
+              <button id="cancel-edit" class="secondary-button" type="button">Làm mới form</button>
+              <button class="primary-button" type="submit">Lưu vào danh sách</button>
+            </div>
+          </form>
+          <p id="editor-message" class="message" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+
+    <footer>Trang quản trị không hiển thị mã truy cập và không lưu mã này vào mã nguồn.</footer>
+  </main>
+
+  <template id="link-row-template">
+    <div class="link-row">
+      <label><span class="sr-only">Tên nền tảng</span><input class="link-label" list="platform-options" placeholder="Nền tảng"></label>
+      <label><span class="sr-only">Đường dẫn</span><input class="link-url" type="url" placeholder="https://..."></label>
+      <button class="remove-link" type="button" aria-label="Xóa đường dẫn">×</button>
+    </div>
+  </template>
+  <datalist id="platform-options"><option value="Spotify"><option value="YouTube"><option value="SoundCloud"><option value="Apple Music"><option value="YouTube Music"></datalist>
+  <script src="catalog.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
